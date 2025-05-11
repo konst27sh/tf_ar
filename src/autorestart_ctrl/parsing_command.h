@@ -11,7 +11,7 @@
 
 uint8_t getCmdType(char *cmd, CMD_TYPE_e *cmdTypeE);
 void getPortNum(char *portStr, uint8_t *portNum);
-void printBufferJson(resetPort_U *resetStatic);
+void printBufferJson(resetPort_U *resetStatic, uint8_t filterPort);
 
 
 

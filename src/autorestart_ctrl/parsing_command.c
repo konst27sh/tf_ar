@@ -40,7 +40,7 @@ void getPortNum(char *portStr, uint8_t *portNum)
     }
 }
 
-void printBufferJson(resetPort_U *resetStatic)
+void printBufferJson(resetPort_U *resetStatic, uint8_t filterPort)
 {
     size_t lenErrorMsg      = 0;
     size_t len_programmMsg  = 0;
@@ -93,164 +93,170 @@ void printBufferJson(resetPort_U *resetStatic)
 
     printf("\"port\":[\n ");
 
+
     for (int portNum = 0; portNum < NUM_PORTS; portNum++)
     {
-        char errorMsg[256];
-        strcpy(errorMsg, "");
-        if(resetStatic->status.resetPort[portNum].errorCode == ERR_OK) {
-            resetStatic->status.resetPort[portNum].errorCode = 0;
-            strcpy(errorMsg, "OK");
-        }
-        if(resetStatic->status.resetPort[portNum].errorCode != ERR_OK)
+        if (filterPort == 0 ||  (portNum + 1) == filterPort)
         {
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_MANUAL_REBOOT) {
-                strcat(errorMsg, "manual rebooting... ");
+            char errorMsg[256];
+            strcpy(errorMsg, "");
+            if (resetStatic->status.resetPort[portNum].errorCode == ERR_OK) {
+                resetStatic->status.resetPort[portNum].errorCode = 0;
+                strcpy(errorMsg, "OK");
             }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_REBOOTING) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "auto rebooting... ");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_POE_DOWN) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "info: PoE switched off according to the schedule");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_UNAVAILABLE_RESOURCE) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: unavailable resource");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_NULL_OBJ) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: obj null");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_CREATE_THREAD) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: create thread");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_JOIN_THREAD) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: join thread");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_PoE_DISABLE) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: PoE disabled");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_TEST_TYPE) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: test type");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_IP_NOT_VALID) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: ip not valid");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_TIME_NOT_VALID) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: time not valid");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_SPEED_VALUE) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: speed not in range");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_PORT_DISABLE) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "port disable");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_TEST_DISABLE) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "test disable");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_TEST_LINK) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: test link");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_TEST_PING) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: test ping");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_TEST_SPEED) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: test speed");
-            }
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_TIME_ALARM) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: time alarm");
-            }
+            if (resetStatic->status.resetPort[portNum].errorCode != ERR_OK) {
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_MANUAL_REBOOT) {
+                    strcat(errorMsg, "manual rebooting... ");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_REBOOTING) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "auto rebooting... ");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_POE_DOWN) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "info: PoE switched off according to the schedule");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_UNAVAILABLE_RESOURCE) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: unavailable resource");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_NULL_OBJ) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: obj null");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_CREATE_THREAD) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: create thread");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_JOIN_THREAD) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: join thread");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_PoE_DISABLE) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: PoE disabled");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_TEST_TYPE) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: test type");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_IP_NOT_VALID) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: ip not valid");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_TIME_NOT_VALID) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: time not valid");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_SPEED_VALUE) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: speed not in range");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_PORT_DISABLE) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "port disable");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_TEST_DISABLE) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "test disable");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_TEST_LINK) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: test link");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_TEST_PING) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: test ping");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_TEST_SPEED) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: test speed");
+                }
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_TIME_ALARM) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: time alarm");
+                }
 
-            if(resetStatic->status.resetPort[portNum].errorCode & ERR_PORT_SHUTDOWN) {
-                lenErrorMsg = strlen(errorMsg);
-                if (lenErrorMsg)
-                    strcat(errorMsg, ", ");
-                strcat(errorMsg, "error: reboot disabled after max resets");
+                if (resetStatic->status.resetPort[portNum].errorCode & ERR_PORT_SHUTDOWN) {
+                    lenErrorMsg = strlen(errorMsg);
+                    if (lenErrorMsg)
+                        strcat(errorMsg, ", ");
+                    strcat(errorMsg, "error: reboot disabled after max resets");
+                }
             }
-        }
-        if (portNum < (NUM_PORTS-1))
-        {
-            printf("{ \n"
-                   "\t\"id\":\"%d\",\n"
-                   "\t\"error_Code\":\"%d\",\n"
-                   "\t\"status\":\"%s\",\n"
-                   "\t\"reboot_cnt\":\"%d\",\n"
-                   "\t\"time\":\"%s\",\n"
-                   "\t\"test_type\":\"%d\",\n"
-                   "\t\"speed_kbit\":\"%d\",\n"
-                   "\t\"manual_reboot\":\"%d\""
-                   "\n },"
-                   "\n",
-                   resetStatic->status.resetPort[portNum].portNum,     resetStatic->status.resetPort[portNum].errorCode, errorMsg,
-                   resetStatic->status.resetPort[portNum].resetCount,  resetStatic->status.resetPort[portNum].timeStr,
-                   resetStatic->status.resetPort[portNum].testType,    resetStatic->status.resetPort[portNum].rx_speed_Kbit,
-                   resetStatic->status.resetPort[portNum].status);
-        }
-        else
-        {
-            printf("{ \n"
-                   "\t\"id\":\"%d\",\n"
-                   "\t\"error_Code\":\"%d\",\n"
-                   "\t\"status\":\"%s\",\n"
-                   "\t\"reboot_cnt\":\"%d\",\n"
-                   "\t\"time\":\"%s\",\n"
-                   "\t\"test_type\":\"%d\",\n"
-                   "\t\"speed_kbit\":\"%d\",\n"
-                   "\t\"manual_reboot\":\"%d\""
-                   "\n }"
-                   "\n",
-                   resetStatic->status.resetPort[portNum].portNum,     resetStatic->status.resetPort[portNum].errorCode, errorMsg,
-                   resetStatic->status.resetPort[portNum].resetCount,  resetStatic->status.resetPort[portNum].timeStr,
-                   resetStatic->status.resetPort[portNum].testType,    resetStatic->status.resetPort[portNum].rx_speed_Kbit,
-                   resetStatic->status.resetPort[portNum].status);
+            if (portNum < (NUM_PORTS - 1)) {
+                printf("{ \n"
+                       "\t\"id\":\"%d\",\n"
+                       "\t\"error_Code\":\"%d\",\n"
+                       "\t\"status\":\"%s\",\n"
+                       "\t\"reboot_cnt\":\"%d\",\n"
+                       "\t\"time\":\"%s\",\n"
+                       "\t\"test_type\":\"%d\",\n"
+                       "\t\"speed_kbit\":\"%d\",\n"
+                       "\t\"manual_reboot\":\"%d\""
+                       "\n },"
+                       "\n",
+                       resetStatic->status.resetPort[portNum].portNum, resetStatic->status.resetPort[portNum].errorCode,
+                       errorMsg,
+                       resetStatic->status.resetPort[portNum].resetCount,
+                       resetStatic->status.resetPort[portNum].timeStr,
+                       resetStatic->status.resetPort[portNum].testType,
+                       resetStatic->status.resetPort[portNum].rx_speed_Kbit,
+                       resetStatic->status.resetPort[portNum].status);
+            } else {
+                printf("{ \n"
+                       "\t\"id\":\"%d\",\n"
+                       "\t\"error_Code\":\"%d\",\n"
+                       "\t\"status\":\"%s\",\n"
+                       "\t\"reboot_cnt\":\"%d\",\n"
+                       "\t\"time\":\"%s\",\n"
+                       "\t\"test_type\":\"%d\",\n"
+                       "\t\"speed_kbit\":\"%d\",\n"
+                       "\t\"manual_reboot\":\"%d\""
+                       "\n }"
+                       "\n",
+                       resetStatic->status.resetPort[portNum].portNum, resetStatic->status.resetPort[portNum].errorCode,
+                       errorMsg,
+                       resetStatic->status.resetPort[portNum].resetCount,
+                       resetStatic->status.resetPort[portNum].timeStr,
+                       resetStatic->status.resetPort[portNum].testType,
+                       resetStatic->status.resetPort[portNum].rx_speed_Kbit,
+                       resetStatic->status.resetPort[portNum].status);
+            }
         }
     }
     printf("]\n }\n");

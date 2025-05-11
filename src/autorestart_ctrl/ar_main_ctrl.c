@@ -33,7 +33,7 @@ int main(int argc, char **argv)
         else
         {
             resetPort.status.arCtrlError = flag_isRunning;
-            printBufferJson(&resetPort);
+            printBufferJson(&resetPort, 0);
         }
     }
     return flag_isRunning;
@@ -55,6 +55,10 @@ static AR_CTRL_ERROR ctrl_mainHandler(int argc, char **argv)
     }
     else if (cmdType == cmd_status)
     {
+        if (argc == 3)
+        {
+            getPortNum( argv[2], &portNum);
+        }
         socketErr = comHandler(cmdType, 0, resetPort.arr);
     }
     else if (cmdType == cmd_reboot)
@@ -73,6 +77,7 @@ static AR_CTRL_ERROR ctrl_mainHandler(int argc, char **argv)
                 syslog(LOG_ERR, "port <%d>: error port number not corrected", portNum);
                 closelog();
             }
+            portNum = 0;
         }
         else
         {
@@ -87,7 +92,7 @@ static AR_CTRL_ERROR ctrl_mainHandler(int argc, char **argv)
     }
 
     resetPort.status.arCtrlError = flag_isRunning;
-    printBufferJson(&resetPort);
+    printBufferJson(&resetPort, portNum);
     return errorCode;
 }
 
