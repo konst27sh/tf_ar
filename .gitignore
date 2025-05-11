@@ -6,3 +6,5 @@
 /.idea/.gitignore
 /src/cmake-build-debug/
 /src/cmake-build-debug/.ninja_log
+/.idea/.name
+/.idea/tf_ar.iml
